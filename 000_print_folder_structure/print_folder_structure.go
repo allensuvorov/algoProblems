@@ -6,15 +6,25 @@ type Trie struct {
 
 type Node struct {
 	isEnd    bool
-	Children map[byte]*Node
+	Children map[rune]*Node
 }
 
-func (this Trie) Insert(path string) {
-
+func newNode() *Node {
+	return &Node{Children: make(map[rune]*Node)}
 }
 
-func (this Trie) Print() {
+func (this *Trie) Insert(path string) {
+	now := this.root
+	for _, c := range path {
+		if now.Children[c] == nil {
+			now.Children[c] = newNode()
+		}
+		now = now.Children[c]
+	}
+}
 
+func (this *Trie) Print() {
+	now := this.root
 }
 
 func main() {
