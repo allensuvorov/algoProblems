@@ -1,5 +1,16 @@
 package main
 
+import "fmt"
+
+var data []string = []string{
+	"/app/components/header",
+	"/app/services",
+	"/app/tests/components/header",
+	"/images/image.png",
+	"tsconfig.json",
+	"Index.html",
+}
+
 type Trie struct {
 	root *Node
 }
@@ -10,60 +21,52 @@ type Node struct {
 }
 
 func newNode() *Node {
-	return &Node{Children: make(map[string]*Node)}
+	return &Node{isEnd: false, Children: make(map[string]*Node)}
 }
 
 func (this *Trie) Insert(path string) {
 	now := this.root
-	pathChars := []rune{}
-	for _, c := range path {
-		if c == '/' && len(pathChars) != 0 {
-			pathStr := string(pathChars)
-			if now.Children[pathStr] == nil {
-				now.Children[pathStr] = newNode()
+	name := []rune{}
+
+	flush := func() {
+		if len(name) != 0 {
+			sName := string(name)
+			if now.Children[sName] == nil {
+				now.Children[sName] = newNode()
 			}
-			now = now.Children[pathStr]
-			pathChars = pathChars[:0]
+			now = now.Children[sName]
+			name = name[:0]
+		}
+	}
+	for _, c := range path {
+		if c == '/' {
+			if len(name) != 0 {
+				flush()
+			}
 		} else {
-			pathChars = append(pathChars, c)
+			name = append(name, c)
+		}
+	}
+	flush()
+	now.isEnd = true
+}
+
+func (this *Trie) dfsPrint(now *Node, pref []rune) {
+	pref = append(pref, '-')
+	if !now.isEnd {
+		for val, node := range now.Children {
+			fmt.Println(string(pref) + val)
+			this.dfsPrint(node, pref)
 		}
 	}
 }
 
-func (this *Trie) Print() {
-	now := this.root
-
-}
-
 func main() {
+	t := new(Trie)
+	t.root = newNode()
+	for _, path := range data {
+		t.Insert(path)
+	}
+	t.dfsPrint(t.root, []rune{})
 	println("test")
 }
-
-// Suppose you have a file named           "/home/files/xyz"
-
-// Print out the directory structure of the file like the following
-
-// - home
-// -- files
-// --- xyz
-
-// Given the following file names
-
-// /app/components/header
-// /app/services
-// /app/tests/components/header
-// /images/image.png
-// tsconfig.json
-// Index.html
-
-// - app
-// -- components
-// --- header
-// -- services
-// -- tests
-// --- components
-// ---- header
-// - images
-// -- Image.png
-// - tsconfig.json
-// - index.html
