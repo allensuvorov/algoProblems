@@ -12,23 +12,14 @@ func getArtisticPhotographCount(N int32, C string, X int32, Y int32) int32 {
   prefSumArrayB := getPrefSumArray('B', C)
   
   var res int32
-  for i, v := range C {
-    if v == 'A' {
-      leftPCount := getPrefSum(i - int(X), N, prefSumArrayP) - getPrefSum(i - int(Y) - 1, N, prefSumArrayP)
-      
-      var rightBCount int32
-      if int32(i) + X < N {
-        rightBCount = getPrefSum(i + int(Y), N, prefSumArrayB) - getPrefSum(i + int(X) - 1, N, prefSumArrayB)
-      }
-      fmt.Println(leftPCount, rightBCount)
+  for i := X; i < N - X; i++ {
+    if C[i] == 'A' {
+      leftPCount := getPrefSum(i - X, N, prefSumArrayP) - getPrefSum(i - Y - 1, N, prefSumArrayP)
+      rightBCount := getPrefSum(i + Y, N, prefSumArrayB) - getPrefSum(i + X - 1, N, prefSumArrayB)
       res += leftPCount * rightBCount
 
-      leftBCount := getPrefSum(i - int(X), N, prefSumArrayB) - getPrefSum(i - int(Y) - 1, N, prefSumArrayB)
-      var rightPCount int32
-      if int32(i) + X < N {
-        rightPCount = getPrefSum(i + int(Y), N, prefSumArrayP) - getPrefSum(i + int(X) - 1, N, prefSumArrayP)
-      }
-      fmt.Println(leftBCount, rightPCount)
+      leftBCount := getPrefSum(i - X, N, prefSumArrayB) - getPrefSum(i - Y - 1, N, prefSumArrayB)
+      rightPCount := getPrefSum(i + Y, N, prefSumArrayP) - getPrefSum(i + X - 1, N, prefSumArrayP)
       res += leftBCount * rightPCount
     }
   }
@@ -47,21 +38,15 @@ func getPrefSumArray(char rune, C string) []int32 {
   return prefSumArray
 }
 
-func getPrefSum(i int, N int32, prefSumArray []int32) int32 {
+func getPrefSum(i int32, N int32, prefSumArray []int32) int32 {
   // validate index i
   if i < 0 {
     return 0
   }
-  if i >= int(N) {
-    i = int(N) - 1
+  if i >= N {
+    i = N - 1
   }
   return prefSumArray[i]
 }
 
-/*
-  APABA
-     lr
-^ 
-P:01111
-B 00011
-*/
+
